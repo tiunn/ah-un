@@ -240,124 +240,124 @@
 
     }
 
-function extractLastWords(text) {
-  // 測試文字
-  // 正規表達式：匹配每行最後一個以空格或減號分隔的字
-  const regex = /(?:^|[-\s])([^-\s]+)$/gm;
-  
-  // 儲存結果的陣列
-  //const results = [];
-  let match;
+    function extractLastWords(text) {
+      // 測試文字
+      // 正規表達式：匹配每行最後一個以空格或減號分隔的字
+      const regex = /(?:^|[-\s])([^-\s]+)$/gm;
+      
+      // 儲存結果的陣列
+      //const results = [];
+      let match;
 
-  if ((match = regex.exec(text)) === null) {
-    return -1;
-  }
-  const output = removeToneMarks(match[1]);
-  const unBo = matchSuffix(output[0]);
-  const siannTiau = output[1];
-  //console.log(`第 ${index + 1} 行: ${word} 韻母: ${unBo} 聲調: ${siannTiau}`);
+      if ((match = regex.exec(text)) === null) {
+        return -1;
+      }
+      const output = removeToneMarks(match[1]);
+      const unBo = matchSuffix(output[0]);
+      const siannTiau = output[1];
+      //console.log(`第 ${index + 1} 行: ${word} 韻母: ${unBo} 聲調: ${siannTiau}`);
 
-  return [unBo, siannTiau];
+      return [unBo, siannTiau];
 
-}
-
-function matchLongestSuffixFragment(word, fragments) {
-  let matched = '';
-
-  for (let fragment of fragments) {
-    // 只比對字尾是否符合
-    if (word.endsWith(fragment) && fragment.length > matched.length) {
-      matched = fragment;
     }
-  }
 
-  return matched;
-}
+    function matchLongestSuffixFragment(word, fragments) {
+      let matched = '';
 
-// 測試範例
-function matchSuffix(word) {
-  //const word = 'tiaun';
-  const fragments = ['a', 'aⁿ', 'ah', 'aⁿh', 'ia', 'iaⁿ', 'iah', 'iaⁿh', 'oa', 'oaⁿ', 'oah', 'oaⁿh', 'e', 'eⁿ', 'eh', 'eⁿh', 'oe', 'oeⁿ', 'oeⁿh', 'i', 'iⁿ', 'ih', 'iⁿh', 'ai', 'aiⁿ', 'aih', 'aiⁿh', 'ui', 'uiⁿ', 'uih', 'uiⁿh', 'oai', 'oaiⁿ', 'oaih', 'oaiⁿh', 'o', 'oh', 'io', 'ioⁿ', 'ioh', 'o͘', 'o͘ⁿ', 'o͘h', 'o͘ⁿh', 'u', 'uh', 'au', 'auⁿ', 'auh', 'iu', 'iuh', 'iuⁿ', 'iuⁿh', 'iau', 'iauh', 'iauⁿh', 'm', 'mh', 'ng', 'ngh', 'am', 'an', 'ang', 'iam', 'ian', 'iang', 'oan', 'eng', 'im', 'in', 'ong', 'om', 'iong', 'un', 'ap', 'at', 'ak', 'iap', 'iat', 'iak', 'oat', 'ek', 'ip', 'it', 'ok', 'op', 'iok', 'ut'];
-  const result = matchLongestSuffixFragment(word, fragments);
-  //console.log(`字 "${word}" 韻母: ${result}`);
-  return result;
-}
+      for (let fragment of fragments) {
+        // 只比對字尾是否符合
+        if (word.endsWith(fragment) && fragment.length > matched.length) {
+          matched = fragment;
+        }
+      }
 
-function removeToneMarks(text) {
-  // 聲調符號對應表：將有聲調的字母轉為原始母音
-  const toneMap = {
-    'á': 'a2', 'à': 'a3', 'â': 'a5', 'ā': 'a7', 'ă': 'a9', 'a̍': 'a8',
-    'é': 'e2', 'è': 'e3', 'ê': 'e5', 'ē': 'e7', 'ĕ': 'e9', 'e̍': 'e8',
-    'í': 'i2', 'ì': 'i3', 'î': 'i5', 'ī': 'i7', 'ĭ': 'i9', 'i̍': 'i8',
-    'ó': 'o2', 'ò': 'o3', 'ô': 'o5', 'ō': 'o7', 'ŏ': 'o9', 'o̍': 'o8',
-    'ú': 'u2', 'ù': 'u3', 'û': 'u5', 'ū': 'u7', 'ŭ': 'u9', 'u̍': 'u8',
-    'ó͘': 'o͘2', 'ò͘': 'o͘3', 'ô͘': 'o͘5', 'ō͘': 'o͘7', 'ŏ͘': 'o͘9', 'o͘': 'o͘8',
-    'ḿ': 'm2', 'm̀': 'm3', 'm̂': 'm5', 'm̄': 'm7', 'm̆': 'm9', 'm̍': 'm8',
-    'ń': 'n2', 'ǹ': 'n3', 'n̂': 'n5', 'n̄': 'n7', 'n̆': 'n9', 'n̍': 'n8',
-    'ńg': 'ng2', 'ǹg': 'ng3', 'n̂g': 'n5', 'n̄g': 'ng7', 'n̆g': 'ng9', 'n̍g': 'ng8'
-  };
-
-  // 將 toneMap 的 key 依長度排序（避免 ng 被拆成 n + g）
-  const sortedKeys = Object.keys(toneMap).sort((a, b) => b.length - a.length);
-
-  // 替換所有有聲調的字母
-  for (let key of sortedKeys) {
-    const regex = new RegExp(key, 'g');
-    if (text.includes(key)) {
-      text = text.replace(regex, toneMap[key]);
-      //console.log(text);
-      break;
+      return matched;
     }
-    //text = text.replace(regex, toneMap[key]);
-    //console.log(text)
-  }
-  const toneTextNum = extractTextAndNumbers(text);
 
-  const lastChar = toneTextNum.textWithoutNumbers.slice(-1).toLowerCase();
+    // 測試範例
+    function matchSuffix(word) {
+      //const word = 'tiaun';
+      const fragments = ['a', 'aⁿ', 'ah', 'aⁿh', 'ia', 'iaⁿ', 'iah', 'iaⁿh', 'oa', 'oaⁿ', 'oah', 'oaⁿh', 'e', 'eⁿ', 'eh', 'eⁿh', 'oe', 'oeⁿ', 'oeⁿh', 'i', 'iⁿ', 'ih', 'iⁿh', 'ai', 'aiⁿ', 'aih', 'aiⁿh', 'ui', 'uiⁿ', 'uih', 'uiⁿh', 'oai', 'oaiⁿ', 'oaih', 'oaiⁿh', 'o', 'oh', 'io', 'ioⁿ', 'ioh', 'o͘', 'o͘ⁿ', 'o͘h', 'o͘ⁿh', 'u', 'uh', 'au', 'auⁿ', 'auh', 'iu', 'iuh', 'iuⁿ', 'iuⁿh', 'iau', 'iauh', 'iauⁿh', 'm', 'mh', 'ng', 'ngh', 'am', 'an', 'ang', 'iam', 'ian', 'iang', 'oan', 'eng', 'im', 'in', 'ong', 'om', 'iong', 'un', 'ap', 'at', 'ak', 'iap', 'iat', 'iak', 'oat', 'ek', 'ip', 'it', 'ok', 'op', 'iok', 'ut'];
+      const result = matchLongestSuffixFragment(word, fragments);
+      console.log(`字 "${word}" 韻母: ${result}`);
+      return result;
+    }
 
-  var toneNumber = 0;
-  const jipSiann = ['h', 'p', 't', 'k'];
+    function removeToneMarks(text) {
+      // 聲調符號對應表：將有聲調的字母轉為原始母音
+      const toneMap = {
+        'á': 'a2', 'à': 'a3', 'â': 'a5', 'ā': 'a7', 'ă': 'a9', 'a̍': 'a8',
+        'é': 'e2', 'è': 'e3', 'ê': 'e5', 'ē': 'e7', 'ĕ': 'e9', 'e̍': 'e8',
+        'í': 'i2', 'ì': 'i3', 'î': 'i5', 'ī': 'i7', 'ĭ': 'i9', 'i̍': 'i8',
+        'ó': 'o2', 'ò': 'o3', 'ô': 'o5', 'ō': 'o7', 'ŏ': 'o9', 'o̍': 'o8',
+        'ú': 'u2', 'ù': 'u3', 'û': 'u5', 'ū': 'u7', 'ŭ': 'u9', 'u̍': 'u8',
+        'ó͘': 'o͘2', 'ò͘': 'o͘3', 'ô͘': 'o͘5', 'ō͘': 'o͘7', 'ŏ͘': 'o͘9', 'o͘': 'o͘8',
+        'ḿ': 'm2', 'm̀': 'm3', 'm̂': 'm5', 'm̄': 'm7', 'm̆': 'm9', 'm̍': 'm8',
+        'ń': 'n2', 'ǹ': 'n3', 'n̂': 'n5', 'n̄': 'n7', 'n̆': 'n9', 'n̍': 'n8',
+        'ńg': 'ng2', 'ǹg': 'ng3', 'n̂g': 'n5', 'n̄g': 'ng7', 'n̆g': 'ng9', 'n̍g': 'ng8'
+      };
 
-  if ( jipSiann.includes(lastChar) && toneTextNum.extractedNumbers != 8 ) {
-    toneNumber = 4;
-  } else if (toneTextNum.extractedNumbers == '') {
-    toneNumber = 1;
-  } else {
-    toneNumber = toneTextNum.extractedNumbers;
-  }
+      // 將 toneMap 的 key 依長度排序（避免 ng 被拆成 n + g）
+      const sortedKeys = Object.keys(toneMap).sort((a, b) => b.length - a.length);
 
-  //console.log("去除聲調後: " + toneTextNum.textWithoutNumbers + " , 聲調： " + toneNumber);
+      // 替換所有有聲調的字母
+      for (let key of sortedKeys) {
+        const regex = new RegExp(key, 'g');
+        if (text.includes(key)) {
+          text = text.replace(regex, toneMap[key]);
+          //console.log(text);
+          break;
+        }
+        //text = text.replace(regex, toneMap[key]);
+        //console.log(text)
+      }
+      const toneTextNum = extractTextAndNumbers(text);
 
-  text = toneTextNum.textWithoutNumbers;
+      const lastChar = toneTextNum.textWithoutNumbers.slice(-1).toLowerCase();
 
-  return [text, toneNumber];
-}
+      var toneNumber = 0;
+      const jipSiann = ['h', 'p', 't', 'k'];
 
-// 測試函式
-/*
-function removeToneMarks(originalText) {
-  //const originalText = "Tâi-gí sī bí-á ê gí-giân. Lí hó--bô?";
-  const cleanedText = removeToneMarks(originalText);
-  console.log("原文: " + originalText);
-  console.log("去除聲調後: " + cleanedText);
-}
-*/
+      if ( jipSiann.includes(lastChar) && toneTextNum.extractedNumbers != 8 ) {
+        toneNumber = 4;
+      } else if (toneTextNum.extractedNumbers == '') {
+        toneNumber = 1;
+      } else {
+        toneNumber = toneTextNum.extractedNumbers;
+      }
+
+      //console.log("去除聲調後: " + toneTextNum.textWithoutNumbers + " , 聲調： " + toneNumber);
+
+      text = toneTextNum.textWithoutNumbers;
+
+      return [text, toneNumber];
+    }
+
+    // 測試函式
+    /*
+    function removeToneMarks(originalText) {
+      //const originalText = "Tâi-gí sī bí-á ê gí-giân. Lí hó--bô?";
+      const cleanedText = removeToneMarks(originalText);
+      console.log("原文: " + originalText);
+      console.log("去除聲調後: " + cleanedText);
+    }
+    */
 
 
-function extractTextAndNumbers(text) {
-  // 使用正規表達式找出所有數字（包含整數與小數）
-  const numberMatches = text.match(/\d+(\.\d+)?/g) || [];
-  //console.log(numberMatches);
-  const numbers = numberMatches.join(', ');
+    function extractTextAndNumbers(text) {
+      // 使用正規表達式找出所有數字（包含整數與小數）
+      const numberMatches = text.match(/\d+(\.\d+)?/g) || [];
+      //console.log(numberMatches);
+      const numbers = numberMatches.join(', ');
 
-  // 移除所有數字（包含整數與小數）
-  const cleanedText = text.replace(/\d+(\.\d+)?/g, '');
+      // 移除所有數字（包含整數與小數）
+      const cleanedText = text.replace(/\d+(\.\d+)?/g, '');
 
-  return {
-    textWithoutNumbers: cleanedText.trim(),
-    extractedNumbers: numbers
-  };
-}
+      return {
+        textWithoutNumbers: cleanedText.trim(),
+        extractedNumbers: numbers
+      };
+    }
 
     function clearText() {
       document.getElementById("inputText").value = "";
