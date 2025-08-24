@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>四句聯押韻檢查工具</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button.submit {
+      background-color: #3498db;
+      color: white;
+    }
+
+    button.submit:hover {
+      background-color: #2980b9;
+    }
+
+    button.clear {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    button.clear:hover {
+      background-color: #c0392b;
+    }
+
+    .result {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 6px;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+
+    label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>四句聯押韻檢查工具</h1>
+    <label for="inputText">請輸入台語文字(干焦支援白話字POJ)：</label>
+    <textarea id="inputText" placeholder="請輸入台語四句聯或其他文字..."></textarea>
+
+    <div class="controls">
+      <label>
+        <input type="checkbox" id="strictMode" />
+        檢查第三句聲調
+      </label>
+      <div class="buttons">
+        <button class="submit" onclick="checkText()">送出</button>
+        <button class="clear" onclick="clearText()">清除</button>
+      </div>
+    </div>
+
+    <label for="result">檢查結果：</label>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function checkText() {
+      const input = document.getElementById("inputText").value.trim();
+      const strict = document.getElementById("strictMode").checked;
+      const resultBox = document.getElementById("result");
+
+      if (!input) {
+        resultBox.textContent = "請先輸入文字。";
+        return;
+      }
+
+      // 模擬檢查邏輯（可替換為實際檢查函式）
+      // let result = `【檢查模式】：${strict ? "嚴謹" : "一般"}\n\n`;
+      result = analyzeSikulian(input, strict);
+
+      resultBox.textContent = result;
+    }
+    function analyzeSikulian(text, strict) {
+
+      const sections = text.split(/\n{2,}/);
+
+      let alertMessages = [];
+
+      sections.forEach((section, index) => {
+        // 將每段詩詞的行分開
+        const lines = section.trim().split(/\n/).filter(line => line.trim() !== '');
+
+        if (lines.length !== 4) {
+          alertMessages.push(`第 ${index + 1} 葩有 ${lines.length} 行，請改做 4 行。`);
+        }
+        lines.forEach(function (e, i) {
+          words = e.split(/[\s\-]+/);
+          if (words.length != 7) {
+            alertMessages.push(`第 ${index + 1} 葩第 ${i+1} 行: ${words}有 ${words.length} 字，請確認是毋是有精差。`);
+          }
+        });
+      });
+      /*
+
+      if (alertMessages.length > 0) {
+        console.log(alertMessages.join('\n'));
+      } else {
+        console.log('所有段落皆為四行，分析完成。');
+      }
+      alertMessages = [];
+      */
+
+      const jipSiann = ['h', 'p', 't', 'k'];
+
+      sections.forEach((section, index) => {
+        const lines = section.trim().split(/\n/).filter(line => line.trim() !== '');
+        let unBo;
+        lines.forEach( function (e, i) {
+          var output = extractLastWords(e);
+          if (output == -1) {
+            alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 無法辨識`);
+          }
+          if (i == 0) {
+            if (output[0].slice(-1) == 'h') {
+              unBo = output[0].slice(0, -1);
+            } else {
+              unBo = output[0]
+            }        
+            console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 押韻韻母: ${output[0]} 聲調: ${output[1]}`);
+          } else {
+            var isH = 0;
+            if (output[0].slice(-1).toLowerCase() == 'h') {
+              output[0] = output[0].slice(0, -1);
+              isH = 1;
+            }
+            if (unBo != output[0]) {
+              console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+              alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 無押韻: ${unBo}`);
+            } else {
+              if ( i == 1 || i == 3 ) { // 檢查第二、四行
+                if (jipSiann.includes(output[0].slice(-1).toLowerCase())) {
+                  console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                  if ( output[1] != 8) {
+                    alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]} 聲調錯誤，應為 8 調`);
+                  }
+                } else {
+                  if ( output[1] == 1 || output[1] == 5 || (output[1] == 8 && isH == 1)) {
+                    console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                  } else {
+                    console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]} 聲調錯誤，應為1, 5 調或 -h 8 調`);
+                  }
+                }
+              } else { // 檢查第三行
+                if (strict == 1) {
+                  if (jipSiann.includes(output[0].slice(-1).toLowerCase())) {
+                    console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                    if ( output[1] != 4) {
+                      alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]} 聲調錯誤，應為 4 調`);
+                    }
+                  } else {
+                    if (output[1] == 2 || output[1] == 3 || output[1] == 7 || (output[1] == 4 && isH == 1)) {
+                      console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                    } else {
+                      console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                      alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]} 聲調錯誤，應為 2, 3, 7 調或 -h 4 調`);
+                    }
+                  }
+                } else {
+                  console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+                }
+
+              }
+              //console.log(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻母: ${output[0]} 聲調: ${output[1]}`);
+            }
+          }
+
+        })
+        console.log('\n');
+      });
+
+      var result = '';
+      if (alertMessages.length > 0) {
+        console.log('\n有揣出一寡問題：\n\n')
+        console.log(alertMessages.join('\n'));
+        result = alertMessages.join('\n');
+      } else {
+        //sections.forEach( function(e, i){ console.log(e)} )
+        console.log('分析完成，無啥物問題');
+        result = '分析完成，無啥物問題'
+      }
+      return result;
+
+    }
+
+function extractLastWords(text) {
+  // 測試文字
+  // 正規表達式：匹配每行最後一個以空格或減號分隔的字
+  const regex = /(?:^|[-\s])([^-\s]+)$/gm;
+  
+  // 儲存結果的陣列
+  //const results = [];
+  let match;
+
+  if ((match = regex.exec(text)) === null) {
+    return -1;
+  }
+  const output = removeToneMarks(match[1]);
+  const unBo = matchSuffix(output[0]);
+  const siannTiau = output[1];
+  //console.log(`第 ${index + 1} 行: ${word} 韻母: ${unBo} 聲調: ${siannTiau}`);
+
+  return [unBo, siannTiau];
+
+}
+
+function matchLongestSuffixFragment(word, fragments) {
+  let matched = '';
+
+  for (let fragment of fragments) {
+    // 只比對字尾是否符合
+    if (word.endsWith(fragment) && fragment.length > matched.length) {
+      matched = fragment;
+    }
+  }
+
+  return matched;
+}
+
+// 測試範例
+function matchSuffix(word) {
+  //const word = 'tiaun';
+  const fragments = ['a', 'aⁿ', 'ah', 'aⁿh', 'ia', 'iaⁿ', 'iah', 'iaⁿh', 'oa', 'oaⁿ', 'oah', 'oaⁿh', 'e', 'eⁿ', 'eh', 'eⁿh', 'oe', 'oeⁿ', 'oeⁿh', 'i', 'iⁿ', 'ih', 'iⁿh', 'ai', 'aiⁿ', 'aih', 'aiⁿh', 'ui', 'uiⁿ', 'uih', 'uiⁿh', 'oai', 'oaiⁿ', 'oaih', 'oaiⁿh', 'o', 'oh', 'io', 'ioⁿ', 'ioh', 'o͘', 'o͘ⁿ', 'o͘h', 'o͘ⁿh', 'u', 'uh', 'au', 'auⁿ', 'auh', 'iu', 'iuh', 'iuⁿ', 'iuⁿh', 'iau', 'iauh', 'iauⁿh', 'm', 'mh', 'ng', 'ngh', 'am', 'an', 'ang', 'iam', 'ian', 'iang', 'oan', 'eng', 'im', 'in', 'ong', 'om', 'iong', 'un', 'ap', 'at', 'ak', 'iap', 'iat', 'iak', 'oat', 'ek', 'ip', 'it', 'ok', 'op', 'iok', 'ut'];
+  const result = matchLongestSuffixFragment(word, fragments);
+  //console.log(`字 "${word}" 韻母: ${result}`);
+  return result;
+}
+
+function removeToneMarks(text) {
+  // 聲調符號對應表：將有聲調的字母轉為原始母音
+  const toneMap = {
+    'á': 'a2', 'à': 'a3', 'â': 'a5', 'ā': 'a7', 'ă': 'a9', 'a̍': 'a8',
+    'é': 'e2', 'è': 'e3', 'ê': 'e5', 'ē': 'e7', 'ĕ': 'e9', 'e̍': 'e8',
+    'í': 'i2', 'ì': 'i3', 'î': 'i5', 'ī': 'i7', 'ĭ': 'i9', 'i̍': 'i8',
+    'ó': 'o2', 'ò': 'o3', 'ô': 'o5', 'ō': 'o7', 'ŏ': 'o9', 'o̍': 'o8',
+    'ú': 'u2', 'ù': 'u3', 'û': 'u5', 'ū': 'u7', 'ŭ': 'u9', 'u̍': 'u8',
+    'ó͘': 'o͘2', 'ò͘': 'o͘3', 'ô͘': 'o͘5', 'ō͘': 'o͘7', 'ŏ͘': 'o͘9', 'o͘': 'o͘8',
+    'ḿ': 'm2', 'm̀': 'm3', 'm̂': 'm5', 'm̄': 'm7', 'm̆': 'm9', 'm̍': 'm8',
+    'ń': 'n2', 'ǹ': 'n3', 'n̂': 'n5', 'n̄': 'n7', 'n̆': 'n9', 'n̍': 'n8',
+    'ńg': 'ng2', 'ǹg': 'ng3', 'n̂g': 'n5', 'n̄g': 'ng7', 'n̆g': 'ng9', 'n̍g': 'ng8'
+  };
+
+  // 將 toneMap 的 key 依長度排序（避免 ng 被拆成 n + g）
+  const sortedKeys = Object.keys(toneMap).sort((a, b) => b.length - a.length);
+
+  // 替換所有有聲調的字母
+  for (let key of sortedKeys) {
+    const regex = new RegExp(key, 'g');
+    if (text.includes(key)) {
+      text = text.replace(regex, toneMap[key]);
+      //console.log(text);
+      break;
+    }
+    //text = text.replace(regex, toneMap[key]);
+    //console.log(text)
+  }
+  const toneTextNum = extractTextAndNumbers(text);
+
+  const lastChar = toneTextNum.textWithoutNumbers.slice(-1).toLowerCase();
+
+  var toneNumber = 0;
+  const jipSiann = ['h', 'p', 't', 'k'];
+
+  if ( jipSiann.includes(lastChar) && toneTextNum.extractedNumbers != 8 ) {
+    toneNumber = 4;
+  } else if (toneTextNum.extractedNumbers == '') {
+    toneNumber = 1;
+  } else {
+    toneNumber = toneTextNum.extractedNumbers;
+  }
+
+  //console.log("去除聲調後: " + toneTextNum.textWithoutNumbers + " , 聲調： " + toneNumber);
+
+  text = toneTextNum.textWithoutNumbers;
+
+  return [text, toneNumber];
+}
+
+// 測試函式
+/*
+function removeToneMarks(originalText) {
+  //const originalText = "Tâi-gí sī bí-á ê gí-giân. Lí hó--bô?";
+  const cleanedText = removeToneMarks(originalText);
+  console.log("原文: " + originalText);
+  console.log("去除聲調後: " + cleanedText);
+}
+*/
+
+
+function extractTextAndNumbers(text) {
+  // 使用正規表達式找出所有數字（包含整數與小數）
+  const numberMatches = text.match(/\d+(\.\d+)?/g) || [];
+  //console.log(numberMatches);
+  const numbers = numberMatches.join(', ');
+
+  // 移除所有數字（包含整數與小數）
+  const cleanedText = text.replace(/\d+(\.\d+)?/g, '');
+
+  return {
+    textWithoutNumbers: cleanedText.trim(),
+    extractedNumbers: numbers
+  };
+}
+
+    function clearText() {
+      document.getElementById("inputText").value = "";
+      document.getElementById("result").textContent = "";
+      document.getElementById("strictMode").checked = false;
+    }
+  </script>
+</body>
+</html>
