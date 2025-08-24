@@ -168,9 +168,6 @@
           if (output == -1) {
             alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 無法辨識`);
           }
-          if (output[0] == '' || output[1] == 0) {
-            alertMessages.push(`第 ${index + 1} 葩 第 ${i + 1} 行: ${e} 韻腳無法辨識`);
-          }
           if (i == 0) {
             if (output[0].slice(-1) == 'h') {
               unBo = output[0].slice(0, -1);
