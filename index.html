@@ -143,7 +143,7 @@
         }
         lines.forEach(function (e, i) {
           words = e.split(/[\s\-]+/);
-          if (words.length != 7) {
+          if (words.length < 7) {
             alertMessages.push(`第 ${index + 1} 葩第 ${i+1} 行: ${e}有 ${words.length} 字，請確認是毋是有精差。`);
           }
         });
