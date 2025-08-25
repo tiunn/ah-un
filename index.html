@@ -280,7 +280,7 @@
     // 測試範例
     function matchSuffix(word) {
       //const word = 'tiaun';
-      const fragments = ['a', 'aⁿ', 'ah', 'aⁿh', 'ia', 'iaⁿ', 'iah', 'iaⁿh', 'oa', 'oaⁿ', 'oah', 'oaⁿh', 'e', 'eⁿ', 'eh', 'eⁿh', 'oe', 'oeⁿ', 'oeⁿh', 'i', 'iⁿ', 'ih', 'iⁿh', 'ai', 'aiⁿ', 'aih', 'aiⁿh', 'ui', 'uiⁿ', 'uih', 'uiⁿh', 'oai', 'oaiⁿ', 'oaih', 'oaiⁿh', 'o', 'oh', 'io', 'ioⁿ', 'ioh', 'o͘', 'o͘ⁿ', 'o͘h', 'o͘ⁿh', 'u', 'uh', 'au', 'auⁿ', 'auh', 'iu', 'iuh', 'iuⁿ', 'iuⁿh', 'iau', 'iauh', 'iauⁿh', 'm', 'mh', 'ng', 'ngh', 'am', 'an', 'ang', 'iam', 'ian', 'iang', 'oan', 'eng', 'im', 'in', 'ong', 'om', 'iong', 'un', 'ap', 'at', 'ak', 'iap', 'iat', 'iak', 'oat', 'ek', 'ip', 'it', 'ok', 'op', 'iok', 'ut'];
+      const fragments = ['a', 'aⁿ', 'ah', 'aⁿh', 'ia', 'iaⁿ', 'iah', 'iaⁿh', 'oa', 'oaⁿ', 'oah', 'oaⁿh', 'e', 'eⁿ', 'eh', 'eⁿh', 'oe', 'oeh', 'oeⁿ', 'i', 'iⁿ', 'ih', 'iⁿh', 'ai', 'aiⁿ', 'aih', 'aiⁿh', 'ui', 'uiⁿ', 'uih', 'uiⁿh', 'oai', 'oaiⁿ', 'oaih', 'oaiⁿh', 'o', 'oh', 'io', 'ioⁿ', 'ioh', 'o͘', 'o͘ⁿ', 'o͘h', 'o͘ⁿh', 'u', 'uh', 'au', 'auⁿ', 'auh', 'iu', 'iuh', 'iuⁿ', 'iuⁿh', 'iau', 'iauh', 'iauⁿh', 'm', 'mh', 'ng', 'ngh', 'am', 'an', 'ang', 'iam', 'ian', 'iang', 'oan', 'eng', 'im', 'in', 'ong', 'om', 'iong', 'un', 'ap', 'at', 'ak', 'iap', 'iat', 'iak', 'oat', 'ek', 'ip', 'it', 'ok', 'op', 'iok', 'ut'];
       const result = matchLongestSuffixFragment(word, fragments);
       console.log(`字 "${word}" 韻母: ${result}`);
       return result;
